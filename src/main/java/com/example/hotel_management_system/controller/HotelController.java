@@ -4,7 +4,9 @@ package com.example.hotel_management_system.controller;
 import com.example.hotel_management_system.dto.HotelDTO;
 import com.example.hotel_management_system.entity.Hotel;
 import com.example.hotel_management_system.service.HotelService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,9 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/hotels")
 public class HotelController {
-
-    @Autowired
-    private HotelService hotelService2;
 
     private final HotelService hotelService;
 
@@ -24,29 +23,34 @@ public class HotelController {
     }
 
     @GetMapping
-    public List<HotelDTO> getHotels() {
-        return hotelService.getAllHotels();
+    public ResponseEntity<List<HotelDTO>> getHotels() {
+        return ResponseEntity.ok(hotelService.getAllHotels());
     }
 
     @PostMapping
-    public String addHotel(@RequestBody Hotel hotel) {
-        hotelService.addHotel(hotel);
-        return "Hotel is created";
+    public ResponseEntity<String> addHotel( @RequestBody HotelDTO hotelDto) {
+        hotelService.addHotel(hotelDto);
+        return ResponseEntity.status(201).body("Hotel is created");
     }
 
     @GetMapping("/{id}")
-    public Hotel getHotel(@PathVariable Long id) {
-        return hotelService.getHotelById(id);
-
+    public ResponseEntity<HotelDTO> getHotelById(@PathVariable Long id) {
+        HotelDTO hotel = hotelService.getHotelById(id);
+        return ResponseEntity.ok(hotel);
     }
 
     @PutMapping("/{id}")
-    public String updateHotel(@PathVariable Long id, @RequestBody Hotel updatedHotel) {
-        boolean updated = hotelService.updateHotel(id, updatedHotel);
-        if (updated) {
-            return "Hotel updated successfully";
-        } else {
-            return "Hotel not found";
-        }
+    public ResponseEntity<String> updateHotel(@PathVariable Long id, @RequestBody HotelDTO hotelDto) {
+
+         hotelService.updateHotel(id, hotelDto);
+
+        return ResponseEntity.ok("Hotel updated successfully");
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteHotel(@PathVariable Long id) {
+        hotelService.deleteHotel(id);
+        return ResponseEntity.ok("Hotel deleted successfully");
+    }
+
 }

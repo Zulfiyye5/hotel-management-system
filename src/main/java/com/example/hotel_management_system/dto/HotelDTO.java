@@ -21,6 +21,4 @@ public class HotelDTO {
     private LocalDateTime createdAt;
 
 
-    public HotelDTO(Hotel hotel) {
-    }
 }

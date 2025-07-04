@@ -6,48 +6,64 @@ import com.example.hotel_management_system.entity.Hotel;
 import com.example.hotel_management_system.exception.NotFoundException;
 import com.example.hotel_management_system.exception.constant.ErrorCode;
 import com.example.hotel_management_system.exception.constant.ErrorMessage;
+import com.example.hotel_management_system.mapper.HotelMapper;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class HotelService {
 
-    private final List<Hotel> hotels = new ArrayList<>();
-
     @Autowired
     private HotelDAO hotelDao;
 
-    public List<HotelDTO> getAllHotels () {
+    @Autowired
+    private HotelMapper hotelMapper;
+
+    public List<HotelDTO> getAllHotels() {
         return hotelDao.getAllHotels()
                 .stream()
-                .map(h -> new HotelDTO(h.getId(), h.getName(),h.getLocation(),h.getCreatedAt()))
+                .map(hotelMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public void addHotel(Hotel hotel) {
-        hotelDao.addHotel(hotel);
+    public void addHotel(HotelDTO hotelDto) {
+        hotelDao.addHotel(hotelMapper.toEntity(hotelDto));
     }
 
+    public HotelDTO getHotelById(Long id) {
 
-    public Hotel getHotelById(Long id) {
         try {
-            return hotelDao.getHotelById(id);
+            Hotel hotel = hotelDao.getHotelById(id);
+            return hotelMapper.toDto(hotel);
         } catch (EmptyResultDataAccessException ex) {
             throw new NotFoundException(ErrorCode.NOT_FOUND, ErrorMessage.HOTEL_NOT_FOUND);
         }
     }
 
-    public boolean updateHotel(Long id, Hotel updatedHotel) {
-        return  hotelDao.updateHotel(id,updatedHotel);
-    }
-    public boolean deleteHotel(Long id){
-        return  hotelDao.deleteHotel(id);
+    public void updateHotel(Long id, HotelDTO hotelDto) {
+
+        try{
+            getHotelById(id);
+            hotelDao.updateHotel(id, hotelMapper.toEntity(hotelDto));
+        }
+        catch (EmptyResultDataAccessException ex) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND, ErrorMessage.HOTEL_NOT_FOUND);
+        }
+
     }
 
-
+    public boolean deleteHotel(Long id) {
+        try{
+            return hotelDao.deleteHotel(id);
+        }
+        catch (EmptyResultDataAccessException ex) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND, ErrorMessage.HOTEL_NOT_FOUND);
+        }
+    }
 }
+
+

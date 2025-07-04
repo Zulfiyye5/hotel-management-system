@@ -23,6 +23,7 @@ public class Hotel {
     @Size(min = 1, max = 255) @NotNull
     private String name;
     private String location;
+    @Column(name = "created_at")
     private  LocalDateTime createdAt = LocalDateTime.now();
 
 

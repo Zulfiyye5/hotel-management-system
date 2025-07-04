@@ -7,7 +7,7 @@ public interface HotelDAO {
     List<Hotel>  getAllHotels();
     void addHotel(Hotel hotel);
     Hotel getHotelById(Long id);
-    boolean updateHotel(Long id, Hotel updatedHotel);
+    void updateHotel(Long id, Hotel updatedHotel);
     boolean deleteHotel(Long id);
 
 }
